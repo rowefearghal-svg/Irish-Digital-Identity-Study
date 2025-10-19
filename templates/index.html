@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Digital Identity Research Study (Ireland)</title>
+    <script src="/static/fp_wrapper.js"></script> 
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; background-color: #f4f4f9; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+        h1 { color: #004d40; }
+        .disclaimer { border: 1px solid #ffcc00; padding: 10px; background-color: #fffbe6; margin-bottom: 20px; font-size: 0.9em; text-align: left; }
+        button { padding: 15px 30px; font-size: 1.1em; cursor: pointer; background-color: #4CAF50; color: white; border: none; border-radius: 5px; transition: background-color 0.3s; }
+        button:hover { background-color: #45a049; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+        #results { margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Irish Digital Identity Research Study</h1>
+        
+        <div class="disclaimer">
+            <strong>PRIVACY NOTICE & CONSENT (GDPR):</strong> This study collects anonymous technical data (Canvas/WebGL/Timezone). By clicking 'Start', you consent to our script running 5 sequential tests to submit this anonymous data for machine learning research. We **DO NOT** collect names, IPs, or browsing history. Data is used solely for research into anti-fraud defense.
+        </div>
+        
+        <p>This test verifies your device is suitable for high-precision data. It takes approximately 5-10 seconds to complete.</p>
+        
+        <button id="startButton" onclick="startVaeCollection()">Start Collection (Run 5 Tests)</button>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // This function handles the button click and manages the visual feedback.
+        async function startVaeCollection() {
+            document.getElementById('startButton').disabled = true;
+            document.getElementById('results').innerHTML = "Running 5 sequential hardware tests... Please wait.";
+
+            try {
+                // We assume window.collectFiveFingerprintsAndSubmit is exposed by fp_wrapper.js
+                // This check is now the final point of failure detection.
+                if (typeof window.collectFiveFingerprintsAndSubmit !== 'function') {
+                    document.getElementById('results').innerHTML = "❌ **CRITICAL JS ERROR:** Wrapper script failed to initialize. Check console for details.";
+                    return;
+                }
+                
+                // Call the main acquisition function
+                const finalStatus = await window.collectFiveFingerprintsAndSubmit();
+
+                if (finalStatus.status === 'success') {
+                    document.getElementById('results').innerHTML = 
+                        "✅ **SUBMISSION COMPLETE!** Thank you for your contribution. You may close this window.";
+                } else {
+                    document.getElementById('results').innerHTML = `❌ **ERROR:** Submission failed. Please check server console.`;
+                    document.getElementById('startButton').disabled = false;
+                }
+            } catch (e) {
+                console.error("Uncaught Error in Start Process:", e);
+                document.getElementById('results').innerHTML = `❌ **CRITICAL JS ERROR:** Check console for details.`;
+                document.getElementById('startButton').disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
