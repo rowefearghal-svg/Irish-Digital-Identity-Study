@@ -153,7 +153,7 @@ window.collectFiveFingerprintsAndSubmit = async function() {
 
 
 async function sendDataToServer(data) {
-    const endpoint = '/api/submit-fingerprints'; 
+    const endpoint = 'http://127.0.0.1:5000/api/submit-fingerprints';
     try {
         const response = await fetch(endpoint, {
             method: 'POST',
